@@ -25,11 +25,8 @@ from keras.preprocessing.image import ImageDataGenerator
 
 img_width, img_height = 224, 224
 def path_to_tensor(img_path):
-    # loads RGB image as PIL.Image.Image type
     img = image.load_img(img_path, target_size=(img_width, img_height))
-    # convert PIL.Image.Image type to 3D tensor with shape (224, 224, 3)
     x = image.img_to_array(img)
-    # convert 3D tensor to 4D tensor with shape (1, 224, 224, 3) and return 4D tensor
     return np.expand_dims(x, axis=0)
 def paths_to_tensor(img_paths):
     list_of_tensors = [path_to_tensor(img_path) for img_path in tqdm(img_paths)]
@@ -97,7 +94,7 @@ print(result_breeds)
 
 l=len(result_images)
 
-fig=plt.figure(figsize=(5,5))
+fig=plt.figure(figsize=(7,7))
 if l>3:
 	columns = 3
 else:
@@ -110,20 +107,22 @@ for i in range(0, l):
 	img = cv2.imread(result_images[i])
 	# print(img.shape)
 	fig.add_subplot(rows, columns, i+1)
-	plt.title(result_breeds[i])
+	plt.title(result_breeds[i],fontdict = {'fontsize' : 10})
 	plt.imshow(img)
+	# plt.subplots_adjust(wspace=0.5)
 	cur_axes = plt.gca()
 	cur_axes.axes.get_xaxis().set_visible(False)
 	cur_axes.axes.get_yaxis().set_visible(False)
 plt.savefig("dogs_result.jpg")
+# plt.savefig("temp.jpg")
 
 img_1 = cv2.imread("dogs_result.jpg")
-img_1=cv2.resize(img_1,(500,500))
-img_2 = cv2.resize(cv2.imread("predictions.jpg"),(500,500))
-f_img = np.zeros((500,1000,3))
+img_1=cv2.resize(img_1,(700,700))
+img_2 = cv2.resize(cv2.imread("predictions.jpg"),(700,700))
+f_img = np.zeros((700,1400,3))
 
-f_img[:,:500,:]=img_2
-f_img[:,500:1000,:]=img_1
+f_img[:,:700,:]=img_2
+f_img[:,700:1400,:]=img_1
 
 cv2.imwrite('static/photo/dogs_result.jpg',f_img)
 
