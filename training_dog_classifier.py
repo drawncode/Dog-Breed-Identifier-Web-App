@@ -53,8 +53,10 @@ model1.load_weights('weights/model1.h5')
 
 model2 = Sequential()
 model2.add(GlobalAveragePooling2D(input_shape=(5,5,2048)))
-model2.add(Dense(150, activation='relu', kernel_regularizer=regularizers.l2(0.005)))
-model2.add(Dropout(0.4))
+model2.add(Dense(256, activation='relu')
+model2.add(Dropout(0.3))
+model2.add(Dense(156, activation='relu', kernel_regularizer=regularizers.l2(0.005)))
+model2.add(Dropout(0.3))
 model2.add(Dense(133, activation='softmax'))
 
 # model2.summary()
@@ -62,18 +64,25 @@ model2.add(Dense(133, activation='softmax'))
 
 model2.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
+print("model created")
 
 train_datagen = ImageDataGenerator(rescale=1./255,shear_range=0.2,zoom_range=0.2,horizontal_flip=True)
-
 valid_datagen = ImageDataGenerator(rescale=1./255)
 
 training_set = train_datagen.flow_from_directory('train',target_size=(224, 224),batch_size=20,class_mode='categorical')
 valid_set = valid_datagen.flow_from_directory('valid',target_size=(224, 224),batch_size=22,class_mode='categorical')
-# train_tensors=paths_to_tensor(train_files).astype('float32')/255
+print("creating tensors")
+train_tensors=paths_to_tensor(train_files).astype('float32')/255
 valid_tensors=paths_to_tensor(valid_files).astype('float32')/255
-# train_bottleneck=[model1.predict(np.expand_dims(tensor, axis=0)) for tensor in train_tensors]
+print("creating bottleneck")
+train_bottleneck=[model1.predict(np.expand_dims(tensor, axis=0)) for tensor in train_tensors]
 valid_bottleneck=[model1.predict(np.expand_dims(tensor, axis=0)) for tensor in valid_tensors]
-
-# checkpointer = ModelCheckpoint(filepath='weights/model2.hdf5',verbose=1, save_best_only=True)
-
-# model2.fit(train_bottleneck, train_targets, validation_data=(valid_bottleneck, valid_targets),epochs=20, batch_size=20, callbacks=[checkpointer], verbose=1)
+train_bottleneck=[i[0] for i in train_bottleneck]
+train_bottleneck=np.array(train_bottleneck)
+valid_bottleneck=[i[0] for i in valid_bottleneck]
+valid_bottleneck=np.array(valid_bottleneck)
+# valid_bottleneck=np.reshape(valid_bottleneck,(835,5,5,2048))
+# print(valid_bottleneck.shape)
+checkpointer = ModelCheckpoint(filepath='weights/model2.hdf5',verbose=1, save_best_only=True,save_weights_only=True)
+print("starting training")
+model2.fit(train_bottleneck, train_targets, validation_data=(valid_bottleneck, valid_targets),epochs=25, batch_size=32, callbacks=[checkpointer], verbose=1)

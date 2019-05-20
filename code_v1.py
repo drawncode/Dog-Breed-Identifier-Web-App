@@ -42,8 +42,10 @@ model1.load_weights('weights/model1.h5')
 
 model2 = Sequential()
 model2.add(GlobalAveragePooling2D(input_shape=(5,5,2048)))
-model2.add(Dense(150, activation='relu', kernel_regularizer=regularizers.l2(0.005)))
-model2.add(Dropout(0.4))
+model2.add(Dense(256, activation='relu'))
+model2.add(Dropout(0.3))
+model2.add(Dense(156, activation='relu', kernel_regularizer=regularizers.l2(0.005)))
+model2.add(Dropout(0.3))
 model2.add(Dense(133, activation='softmax'))
 
 # model2.summary()
@@ -55,7 +57,7 @@ model2.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['a
 
 
 
-model2.load_weights('weights/model2.hdf5')
+model2.load_weights('weights/model2.h5')
 
 
 
